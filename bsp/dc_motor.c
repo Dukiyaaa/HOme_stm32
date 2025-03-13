@@ -19,12 +19,12 @@ void STM32_PWM_Stop(TIM_HandleTypeDef *htim, uint32_t Channel)
     __HAL_TIM_SET_COMPARE(htim, Channel, 0);
 }
 
-void airConditioner_heat(int type)
+uint8_t airConditioner_heat(uint8_t type)
 {
 	printf("airConditioner 24, type = %d\n", type);
     if (type < DC_MOTOR_LOW || type > DC_MOTOR_HIGH) {
 			printf("airConditioner 26\n");
-        return;
+        return 0;
     }
 		printf("airConditioner 29\n");
     STM32_PWM_Stop(&htim3, TIM_CHANNEL_1);
@@ -32,30 +32,36 @@ void airConditioner_heat(int type)
 //    HAL_Delay(10);  // 确保 PWM 停止
 		printf("airConditioner 33\n");
     printf("heat\n,speed : %d\n", type);
-    STM32_PWM_Start(&htim3, TIM_CHANNEL_2, speed_array[type]); // CH2 运行
+    STM32_PWM_Start(&htim3, TIM_CHANNEL_2, speed_array[type - 1]); // CH2 运行
     STM32_PWM_Start(&htim3, TIM_CHANNEL_1, 0);
+		
+		return 1;
 }
 
-void airConditioner_cool(int type)
+uint8_t airConditioner_cool(uint8_t type)
 {
     if (type < DC_MOTOR_LOW || type > DC_MOTOR_HIGH) {
-        return;
+        return 0;
     }
     STM32_PWM_Stop(&htim3, TIM_CHANNEL_1);
     STM32_PWM_Stop(&htim3, TIM_CHANNEL_2);
 //    HAL_Delay(10);  // 确保 PWM 停止
 
     printf("cool,speed : %d\n", type);
-    STM32_PWM_Start(&htim3, TIM_CHANNEL_1, speed_array[type]); // CH1 运行
+    STM32_PWM_Start(&htim3, TIM_CHANNEL_1, speed_array[type - 1]); // CH1 运行
     STM32_PWM_Start(&htim3, TIM_CHANNEL_2, 0);
+		
+		return 1;
 }
 
-void airConditioner_stop(void)
+uint8_t airConditioner_stop(void)
 {
     printf("stop\n");
     STM32_PWM_Stop(&htim3, TIM_CHANNEL_1);
     STM32_PWM_Stop(&htim3, TIM_CHANNEL_2);
 //    HAL_Delay(10);  // 确保 PWM 停止
+	
+		return 1;
 }
 
 
@@ -75,10 +81,10 @@ void airConditioner_work(uint8_t airConditioner_state)
     }
 
     if (func_type == 0) {
-        airConditioner_heat(speed_type - 1);
+        airConditioner_heat(speed_type);
         printf("airConditioner heat, type = %d\n", speed_type);
     } else {
-        airConditioner_cool(speed_type - 1);
+        airConditioner_cool(speed_type);
         printf("airConditioner cool, type = %d\n", speed_type);
     }
 }

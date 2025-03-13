@@ -35,7 +35,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+extern uint8_t usart1_data_ready, usart2_data_ready;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -111,7 +111,19 @@ int main(void)
   while (1)
   {
 		ReaderCard();
-		usart2_rx_process();
+		// 处理 USART1 数据（asrpro）
+			if (usart1_data_ready)
+			{
+					usart1_rx_process();  // 处理接收到的数据
+					usart1_data_ready = 0;  // 清除标志位
+			}
+
+			// 处理 USART2 数据（hi3861）
+			if (usart2_data_ready)
+			{
+					usart2_rx_process();  // 处理接收到的数据
+					usart2_data_ready = 0;  // 清除标志位
+			}
 //		usart2_func();
 //		printf("other tasks\n");
 		

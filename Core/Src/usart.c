@@ -209,7 +209,7 @@ int fputc(int ch,FILE *f)
 	return ch;
 }
 
-char usart1_receive_buffer[32] = {0};  // USART1 接收缓冲区
+uint8_t usart1_receive_buffer[4] = {0};  // USART1 接收缓冲区
 uint8_t usart1_receive_pointer = 0;
 
 uint8_t usart2_receive_buffer[4];  // 存储4字节数据  
@@ -218,125 +218,143 @@ uint8_t usart2_receive_pointer = 0;
 uint8_t usart1_rx_data;  // USART1 临时接收字节
 uint8_t usart2_rx_data;  // USART2 临时接收字节
 
+uint8_t usart1_data_ready = 0;  // 标志 USART1 数据是否准备好
+uint8_t usart2_data_ready = 0;  // 标志 USART2 数据是否准备好
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART1)  // 判断是否是 USART1
+    if (huart->Instance == USART1)  
     {
-        usart1_receive_buffer[usart1_receive_pointer++] = usart1_rx_data;
-        if (usart1_receive_pointer >= sizeof(usart1_receive_buffer)) {
-            usart1_receive_pointer = 0;  // 防止溢出
-        }
-        HAL_UART_Receive_IT(&huart1, &usart1_rx_data, 1); // 继续接收
+        usart1_data_ready = 1;  // 标记 USART1 数据已接收完成
+        HAL_UART_Receive_IT(&huart1, usart1_receive_buffer, 4);  // 继续接收
     }
-    else if (huart->Instance == USART2) // 判断是否是 USART2
+    else if (huart->Instance == USART2)  
     {
-        HAL_UART_Receive_IT(&huart2, usart2_receive_buffer, 4); // 继续接收
+        usart2_data_ready = 1;  // 标记 USART2 数据已接收完成
+        HAL_UART_Receive_IT(&huart2, usart2_receive_buffer, 4);  // 继续接收
     }
 }
 
-uint32_t CMD_MASK         = 0xf000000f;
+// 解析 32 位数据
+ParsedData parse_received_data(uint8_t *buffer, uint8_t expected_header)
+{
+    ParsedData data = {0};
 
-uint32_t CMD_DOOR_MASK 		= 0xb0000001;
-uint32_t CMD_DOOR_OPEN_STATE_MASK = 0x000000f0;
-uint32_t CMD_CURTAIN_MASK = 0xb0000002;
+    uint32_t received_cmd = (buffer[0] << 24) |
+                            (buffer[1] << 16) |
+                            (buffer[2] << 8)  |
+                            (buffer[3]);
+
+    data.device_id = received_cmd & 0xF;
+    data.switch_state = (received_cmd >> 4) & 0xF;
+    data.param1 = (received_cmd >> 8) & 0xF;
+    data.param2 = (received_cmd >> 12) & 0xF;
+
+    // 确保帧头正确
+    if (((received_cmd >> 28) & 0xF) != expected_header) {
+        data.valid = 0;
+    } else {
+        data.valid = 1;
+    }
+
+    return data;
+}
+
+uint8_t process_device_command(ParsedData data)
+{
+    uint8_t response = 0x0;
+
+    switch (data.device_id)
+    {
+        case 0x1: // 门
+            response = data.switch_state ? door_open() : door_close();
+            break;
+
+        case 0x2: // 窗帘
+            if (data.switch_state) {
+                curtain_open_angle(data.param1 * 10);
+            } else {
+                curtain_close_angle(data.param1 * 10);
+            }
+            response = 0x1;
+            break;
+
+        case 0x3: // 空调
+            response = data.switch_state ? 
+                        (data.param2 ? airConditioner_heat(data.param1) : airConditioner_cool(data.param1))
+                        : airConditioner_stop();
+            break;
+
+        default:
+            printf("Unknown device ID: %02X\n", data.device_id);
+            response = 0x0;
+            break;
+    }
+    return response;
+}
+
+
+void send_response(uint8_t response, ParsedData data, UART_HandleTypeDef *huart)
+{
+    uint8_t header = (huart == &huart1) ? 0xC : 0xB;  // 适配 USART1 (ASRPRO) 和 USART2 (HI3861)
+
+    uint32_t response_data = ((uint32_t)header << 28) |  
+                             (0x1 << 24) |  
+                             (response << 20) |  
+                             (data.param2 << 12) | 
+                             (data.param1 << 8) | 
+                             (data.switch_state << 4) | 
+                             data.device_id;
+
+    uint8_t response_buffer[4];
+    response_buffer[0] = (response_data >> 24) & 0xFF;
+    response_buffer[1] = (response_data >> 16) & 0xFF;
+    response_buffer[2] = (response_data >> 8) & 0xFF;
+    response_buffer[3] = response_data & 0xFF;
+
+//		printf("stm32 sent : %08x\n", *response_buffer);
+    HAL_UART_Transmit(huart, response_buffer, 4, 100);
+}
+
+
+
+void usart1_rx_process(void)
+{
+    ParsedData data = parse_received_data(usart1_receive_buffer, 0xC);
+    memset(usart1_receive_buffer, 0, sizeof(usart1_receive_buffer));
+
+    if (!data.valid) {
+        printf("Invalid command from asrpro!\n");
+        send_response(0x0, data, &huart1);
+        return;
+    }
+
+    printf("ASRPRO Received: %02X %02X %02X %02X\n", data.device_id, data.switch_state, data.param1, data.param2);
+
+    uint8_t response = process_device_command(data);
+    send_response(response, data, &huart1);
+}
 
 void usart2_rx_process(void)
-{			
-    uint32_t received_cmd = 0;
-
-    // 解析 32 位数据
-    received_cmd = (usart2_receive_buffer[0] << 24) |
-                   (usart2_receive_buffer[1] << 16) |
-                   (usart2_receive_buffer[2] << 8)  |
-                   (usart2_receive_buffer[3]);
-
-		memset(usart2_receive_buffer, 0, sizeof(usart2_receive_buffer));
-	  usart2_receive_pointer = 0;
-    uint8_t device_id = received_cmd & 0xF;            // 最低 4 位（设备 ID）
-    uint8_t switch_state = (received_cmd >> 4) & 0xF; // 倒数第 2 组 4 位（开关）
-    uint8_t param1 = (received_cmd >> 8) & 0xF;       // 倒数第 3 组 4 位（窗帘角度 / 空调档位）
-    uint8_t param2 = (received_cmd >> 12) & 0xF;      // 倒数第 4 组 4 位（空调冷热）
-		
-    // 确保帧头为 `0xB`
-    if (((received_cmd >> 28) & 0xF) != 0xB) {
-        printf("Invalid command!\n");
-        return;
-    }
-
-		printf("Received: %02X %02X %02X %02X\n", 
-            device_id, 
-            switch_state, 
-            param1, 
-            param2);
-    if (device_id == 0x1)  // 门
-    {
-        if (switch_state == 1) 
-        {
-            door_open();
-        }
-        else 
-        {
-            door_close();
-        }
-        return;
-    }
-
-    if (device_id == 0x2) // 窗帘
-    {
-        if (switch_state == 1) 
-        {
-            curtain_open_angle(param1 * 10);  // 角度范围 0~150（每 10 度一档）
-        }
-        else 
-        {
-            curtain_close_angle(param1 * 10);  // 角度范围 0~150（每 10 度一档）
-        }
-        return;
-    }
-
-    if (device_id == 0x3) // 空调
-    {
-				printf("airConditioner 309\n");
-        if (switch_state == 1) // 1 = 开启空调
-        {
-					printf("airConditioner 312\n");
-            if (param2 == 1) // 热模式
-            {
-							printf("airConditioner 315\n");
-                airConditioner_heat(param1);
-            }
-            else // 冷模式
-            {
-                airConditioner_cool(param1);
-            }
-        }
-        else  // 0 = 关闭空调
-        {
-            airConditioner_stop();
-        }
-        return;
-    }
-}
-
-
-void usart2_func(void)
 {
-	if(usart2_receive_pointer > 0)
-	{
-		int temp = usart2_receive_pointer;
-		HAL_Delay(1);
-		if(temp == usart2_receive_pointer)
-		{
-			usart2_rx_process();
-			usart2_receive_pointer = 0;
-			memset(usart2_receive_buffer, 0, sizeof(usart2_receive_buffer));
-		}
-	}
+    ParsedData data = parse_received_data(usart2_receive_buffer, 0xB);
+    memset(usart2_receive_buffer, 0, sizeof(usart2_receive_buffer));
+
+    if (!data.valid) {
+        printf("Invalid command from hi3861!\n");
+        send_response(0x0, data, &huart2);
+        return;
+    }
+
+    printf("HI3861 Received: %02X %02X %02X %02X\n", data.device_id, data.switch_state, data.param1, data.param2);
+
+    uint8_t response = process_device_command(data);
+    send_response(response, data, &huart2);
 }
 
 void usart_init(void)
 {
-	HAL_UART_Receive_IT(&huart1, &usart1_rx_data, 1);
+	HAL_UART_Receive_IT(&huart1, usart1_receive_buffer, 4);
 	HAL_UART_Receive_IT(&huart2, usart2_receive_buffer, 4); // 继续接收
 }
 /* USER CODE END 1 */
