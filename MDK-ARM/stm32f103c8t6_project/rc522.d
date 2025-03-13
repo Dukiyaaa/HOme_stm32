@@ -28,6 +28,12 @@ stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal
 stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 stm32f103c8t6_project\rc522.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-stm32f103c8t6_project\rc522.o: ../Core/Inc/usart.h
 stm32f103c8t6_project\rc522.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\stdio.h
+stm32f103c8t6_project\rc522.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\string.h
+stm32f103c8t6_project\rc522.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\stdbool.h
+stm32f103c8t6_project\rc522.o: ../Core/Inc/usart.h
+stm32f103c8t6_project\rc522.o: ../Core/Inc/tim.h
+stm32f103c8t6_project\rc522.o: ..\bsp\sg90.h

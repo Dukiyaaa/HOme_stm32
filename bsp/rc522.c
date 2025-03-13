@@ -1,5 +1,7 @@
 #include "rc522.h"
 #include "stdio.h"
+#include "tim.h"
+#include "sg90.h"
 
 // SPI2 引脚定义
 // SPI2_SCK      -> PB13
@@ -36,6 +38,8 @@ void RC522_Init(void)
     PcdAntennaOn(); // 打开天线
     
     printf("RFID-MFRC522 init succeed\r\nstart to detect card!\r\n");  // 打印初始化完成信息
+	
+//		HAL_TIM_Base_Start_IT(&htim1);
 }
 
 /**
@@ -481,13 +485,28 @@ void ReaderCard(void)
 			temp_value = ((UID[0]>>4)*10+(UID[0]&0x0f));
 			switch(temp_value)
 			{
+				case 80 : 
+					printf("valid id : %d, succeed!\r\n",temp_value);
+					door_open();
+				break;
 				case 41 : 
 					printf("valid id : %d, succeed!\r\n",temp_value);
+					door_open();
 				break;
 				default : 
 					printf("invalid id :%d，faild!\r\n",temp_value);
+					door_close();
 				break;
 			}	                             
 		}
   } 
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM1)
+	{
+//		printf("entern nfc check irq\n");
+//		ReaderCard();
+	}
 }

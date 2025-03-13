@@ -19,12 +19,18 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rc522.h"
+#include "stdio.h"
+#include "step_motor.h"
+#include "sg90.h"
+#include "dc_motor.h"
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,45 +69,67 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
  
   /* USER CODE END 1 */
- 
+
   /* MCU Configuration--------------------------------------------------------*/
- 
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
- 
+
   /* USER CODE BEGIN Init */
  
   /* USER CODE END Init */
- 
+
   /* Configure the system clock */
   SystemClock_Config();
- 
+
   /* USER CODE BEGIN SysInit */
  
   /* USER CODE END SysInit */
- 
+
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   RC522_Init();
+	sg90_init();
+	airConditioner_init();
+	usart_init();
   /* USER CODE END 2 */
- 
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_Delay(10);
-	ReaderCard();
+		ReaderCard();
+		usart2_rx_process();
+//		usart2_func();
+//		printf("other tasks\n");
+		
+//		curtain_open();
+//		HAL_Delay(500);
+//		door_open();
+//		HAL_Delay(500);
+//		door_close();
+//		HAL_Delay(500);
+//		
+//		airConditioner_work(7);
+//		HAL_Delay(5000);
+//		airConditioner_work(0);
+//		HAL_Delay(5000);
+//		airConditioner_work(6);
+//		HAL_Delay(5000);
     /* USER CODE END WHILE */
- 
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

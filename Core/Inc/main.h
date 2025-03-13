@@ -31,7 +31,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
+#include "string.h"
+#include "stdbool.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -57,6 +59,18 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SG90_PWM_Pin GPIO_PIN_0
+#define SG90_PWM_GPIO_Port GPIOA
+#define DC_MOTOR_PWM_Pin GPIO_PIN_6
+#define DC_MOTOR_PWM_GPIO_Port GPIOA
+#define IN1_Pin GPIO_PIN_3
+#define IN1_GPIO_Port GPIOB
+#define IN2_Pin GPIO_PIN_4
+#define IN2_GPIO_Port GPIOB
+#define IN3_Pin GPIO_PIN_5
+#define IN3_GPIO_Port GPIOB
+#define IN4_Pin GPIO_PIN_6
+#define IN4_GPIO_Port GPIOB
 #define RC522_SDA_Pin GPIO_PIN_8
 #define RC522_SDA_GPIO_Port GPIOB
 #define RC522_RST_Pin GPIO_PIN_9

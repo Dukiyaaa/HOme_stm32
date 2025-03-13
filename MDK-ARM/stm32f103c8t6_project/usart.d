@@ -27,5 +27,12 @@ stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal
 stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 stm32f103c8t6_project\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 stm32f103c8t6_project\usart.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\stdio.h
+stm32f103c8t6_project\usart.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\string.h
+stm32f103c8t6_project\usart.o: D:\MAIN\keil_new\ARM\ARMCC\Bin\..\include\stdbool.h
+stm32f103c8t6_project\usart.o: ../bsp/sg90.h
+stm32f103c8t6_project\usart.o: ../bsp/step_motor.h
+stm32f103c8t6_project\usart.o: ../bsp/dc_motor.h
