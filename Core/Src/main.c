@@ -110,20 +110,29 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  curtain_open_angle(90);
+//	  airConditioner_heat(2);
+//	  HAL_Delay(500);
+//	  airConditioner_cool(2);
+//	  HAL_Delay(500);
+//	  door_open();
+//	  HAL_Delay(500);
+//	  door_close();
+//	  HAL_Delay(500);
 		ReaderCard();
 		// 处理 USART1 数据（asrpro）
-			if (usart1_data_ready)
-			{
-					usart1_rx_process();  // 处理接收到的数据
-					usart1_data_ready = 0;  // 清除标志位
-			}
+		if (usart1_data_ready)
+		{
+			usart1_rx_process();  // 处理接收到的数据
+			usart1_data_ready = 0;  // 清除标志位
+		}
 
-			// 处理 USART2 数据（hi3861）
-			if (usart2_data_ready)
-			{
-					usart2_rx_process();  // 处理接收到的数据
-					usart2_data_ready = 0;  // 清除标志位
-			}
+		// 处理 USART2 数据（hi3861）
+		if (usart2_data_ready)
+		{
+			usart2_rx_process();  // 处理接收到的数据
+			usart2_data_ready = 0;  // 清除标志位
+		}
 //		usart2_func();
 //		printf("other tasks\n");
 		

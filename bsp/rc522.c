@@ -2,13 +2,14 @@
 #include "stdio.h"
 #include "tim.h"
 #include "sg90.h"
+#include "usart.h"
 
 // SPI2 引脚定义
 // SPI2_SCK      -> PB13
 // SPI2_MISO     -> PB14
 // SPI2_MOSI     -> PB15
-// RC522_RST(CE) -> PB9
-// RC522_NSS(SDA)-> PB8
+// RC522_RST(CE) -> PB8
+// RC522_NSS(SDA)-> PB9
 // RC522_IRQ     -> (未使用)
 
 uint8_t UID[5], Temp[4];          
@@ -456,12 +457,15 @@ char PcdAnticoll(unsigned char *pSnr)
 // 读取卡片信息
 // 识别卡片ID
 //==============================================================================
+extern void send_response(uint8_t response, ParsedData data, UART_HandleTypeDef *huart);
 void ReaderCard(void)
 {
 	char temp_value;
     
+	printf("line 465\n");
 	if(PcdRequest(PICC_REQALL,Temp)==MI_OK)	// 发送请求，检测是否有卡片
 	{
+		printf("line 468\n");
 		if(Temp[0]==0x04&&Temp[1]==0x00)  
 				printf("\r\nMFOne-S50\r\n");  // 识别MFOne-S50卡
 		else if(Temp[0]==0x02&&Temp[1]==0x00)
@@ -483,21 +487,39 @@ void ReaderCard(void)
 
 			// 解析UID的第一个字节并进行身份验证
 			temp_value = ((UID[0]>>4)*10+(UID[0]&0x0f));
-			switch(temp_value)
+			switch (temp_value)
 			{
-				case 80 : 
-					printf("valid id : %d, succeed!\r\n",temp_value);
-					door_open();
-				break;
-				case 41 : 
-					printf("valid id : %d, succeed!\r\n",temp_value);
-					door_open();
-				break;
-				default : 
-					printf("invalid id :%d，faild!\r\n",temp_value);
-					door_close();
-				break;
-			}	                             
+//					case 80:
+					case 41:
+							printf("Valid id: %d, succeed!\r\n", temp_value);
+							if (door_open()) 
+							{
+									// **发送应答数据给 HI3861，通知门已打开**
+									ParsedData door_response;
+									door_response.device_id = 0x1;  // 设备 ID = 0x1 (门)
+									door_response.switch_state = 1; // 1 = 门打开
+									door_response.param1 = 0;  // 门无额外参数
+									door_response.param2 = 0;  // 门无额外参数
+
+									send_response(0x1, door_response, &huart2); // **发送应答**
+							}
+							break;
+
+					default:
+							printf("Invalid id: %d, fail!\r\n", temp_value);
+							if (door_close()) 
+							{
+									// **发送应答数据给 HI3861，通知门已关闭**
+									ParsedData door_response;
+									door_response.device_id = 0x1;  // 设备 ID = 0x1 (门)
+									door_response.switch_state = 0; // 0 = 门关闭
+									door_response.param1 = 0;  // 门无额外参数
+									door_response.param2 = 0;  // 门无额外参数
+
+									send_response(0x1, door_response, &huart2); // **发送应答**
+							}
+							break;
+			}                             
 		}
   } 
 }

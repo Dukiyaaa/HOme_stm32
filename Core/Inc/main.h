@@ -71,11 +71,10 @@ void Error_Handler(void);
 #define IN3_GPIO_Port GPIOB
 #define IN4_Pin GPIO_PIN_6
 #define IN4_GPIO_Port GPIOB
-#define RC522_SDA_Pin GPIO_PIN_8
-#define RC522_SDA_GPIO_Port GPIOB
-#define RC522_RST_Pin GPIO_PIN_9
+#define RC522_RST_Pin GPIO_PIN_8
 #define RC522_RST_GPIO_Port GPIOB
-
+#define RC522_SDA_Pin GPIO_PIN_9
+#define RC522_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

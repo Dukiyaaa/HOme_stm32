@@ -205,7 +205,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 int fputc(int ch,FILE *f)
 {
-	HAL_UART_Transmit (&huart2 ,(uint8_t *)&ch,1,HAL_MAX_DELAY );
+	HAL_UART_Transmit (&huart1 ,(uint8_t *)&ch,1,HAL_MAX_DELAY );
 	return ch;
 }
 
@@ -312,7 +312,7 @@ void send_response(uint8_t response, ParsedData data, UART_HandleTypeDef *huart)
     response_buffer[2] = (response_data >> 8) & 0xFF;
     response_buffer[3] = response_data & 0xFF;
 
-//		printf("stm32 sent : %08x\n", *response_buffer);
+		printf("stm32 sent : %08x\n", *response_buffer);
     HAL_UART_Transmit(huart, response_buffer, 4, 100);
 }
 
