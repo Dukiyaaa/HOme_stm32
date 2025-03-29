@@ -13,4 +13,11 @@ void set_sg90_angle(uint16_t angle);
 int door_open(void) ;
 int door_close(void);
 uint8_t door_get_curstate(void);
+
+void set_sg90_3_angle(uint16_t angle);
+void set_sg90_2_angle(uint16_t angle);
+
+void camera_ture_left(void);
+
+void camera_ture_right(void);
 #endif

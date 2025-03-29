@@ -59,10 +59,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SG90_PWM_Pin GPIO_PIN_0
-#define SG90_PWM_GPIO_Port GPIOA
+#define SG90_3_PWM_Pin GPIO_PIN_0
+#define SG90_3_PWM_GPIO_Port GPIOA
 #define DC_MOTOR_PWM_Pin GPIO_PIN_6
 #define DC_MOTOR_PWM_GPIO_Port GPIOA
+#define SG90_2_PWM_Pin GPIO_PIN_11
+#define SG90_2_PWM_GPIO_Port GPIOA
 #define IN1_Pin GPIO_PIN_3
 #define IN1_GPIO_Port GPIOB
 #define IN2_Pin GPIO_PIN_4
@@ -75,6 +77,7 @@ void Error_Handler(void);
 #define RC522_RST_GPIO_Port GPIOB
 #define RC522_SDA_Pin GPIO_PIN_9
 #define RC522_SDA_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -282,7 +282,7 @@ void ReaderCard(void)
             switch (temp_value)
             {
                 case 77:
-                    printf("✅ Valid ID: %d\r\n", temp_value);
+                    printf("Valid ID: %d\r\n", temp_value);
                     if (door_open())
                     {
                         ParsedData resp = { .device_id = 0x1, .switch_state = 1 };
@@ -291,7 +291,7 @@ void ReaderCard(void)
                     break;
 
                 default:
-                    printf("❌ Invalid ID: %d\r\n", temp_value);
+                    printf("Invalid ID: %d\r\n", temp_value);
                     if (door_close())
                     {
                         ParsedData resp = { .device_id = 0x1, .switch_state = 0 };

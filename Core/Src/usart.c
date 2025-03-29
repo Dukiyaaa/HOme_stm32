@@ -209,7 +209,7 @@ int fputc(int ch,FILE *f)
 	return ch;
 }
 
-uint8_t usart1_receive_buffer[4] = {0};  // USART1 接收缓冲区
+uint8_t usart1_receive_buffer[4] = {0};  // USART1 接收缓冲�?
 uint8_t usart1_receive_pointer = 0;
 
 uint8_t usart2_receive_buffer[4];  // 存储4字节数据  
@@ -218,24 +218,24 @@ uint8_t usart2_receive_pointer = 0;
 uint8_t usart1_rx_data;  // USART1 临时接收字节
 uint8_t usart2_rx_data;  // USART2 临时接收字节
 
-uint8_t usart1_data_ready = 0;  // 标志 USART1 数据是否准备好
-uint8_t usart2_data_ready = 0;  // 标志 USART2 数据是否准备好
+uint8_t usart1_data_ready = 0;  // 标志 USART1 数据是否准备�?
+uint8_t usart2_data_ready = 0;  // 标志 USART2 数据是否准备�?
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1)  
     {
-        usart1_data_ready = 1;  // 标记 USART1 数据已接收完成
+        usart1_data_ready = 1;  // 标记 USART1 数据已接收完�?
         HAL_UART_Receive_IT(&huart1, usart1_receive_buffer, 4);  // 继续接收
     }
     else if (huart->Instance == USART2)  
     {
-        usart2_data_ready = 1;  // 标记 USART2 数据已接收完成
+        usart2_data_ready = 1;  // 标记 USART2 数据已接收完�?
         HAL_UART_Receive_IT(&huart2, usart2_receive_buffer, 4);  // 继续接收
     }
 }
 
-// 解析 32 位数据
+// 解析 32 位数�?
 ParsedData parse_received_data(uint8_t *buffer, uint8_t expected_header)
 {
     ParsedData data = {0};
@@ -266,7 +266,7 @@ uint8_t process_device_command(ParsedData data)
 
     switch (data.device_id)
     {
-        case 0x1: // 门
+        case 0x1: // �?
             response = data.switch_state ? door_open() : door_close();
             break;
 
@@ -296,7 +296,7 @@ uint8_t process_device_command(ParsedData data)
 
 void send_response(uint8_t response, ParsedData data, UART_HandleTypeDef *huart)
 {
-    uint8_t header = (huart == &huart1) ? 0xC : 0xB;  // 适配 USART1 (ASRPRO) 和 USART2 (HI3861)
+    uint8_t header = (huart == &huart1) ? 0xC : 0xB;  // 适配 USART1 (ASRPRO) �? USART2 (HI3861)
 
     uint32_t response_data = ((uint32_t)header << 28) |  
                              (0x1 << 24) |  

@@ -51,12 +51,12 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, IN1_Pin|IN2_Pin|IN3_Pin|IN4_Pin
-                          |RC522_SDA_Pin|RC522_RST_Pin, GPIO_PIN_RESET);
+                          |RC522_RST_Pin|RC522_SDA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                            PBPin PBPin */
   GPIO_InitStruct.Pin = IN1_Pin|IN2_Pin|IN3_Pin|IN4_Pin
-                          |RC522_SDA_Pin|RC522_RST_Pin;
+                          |RC522_RST_Pin|RC522_SDA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;

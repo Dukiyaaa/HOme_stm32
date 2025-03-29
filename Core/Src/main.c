@@ -95,15 +95,16 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_USART1_UART_Init();
-  MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_USART2_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   RC522_Init();
 	sg90_init();
 	airConditioner_init();
 	usart_init();
+	set_sg90_2_angle(90);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,19 +121,21 @@ int main(void)
 //	  door_close();
 //	  HAL_Delay(500);
 		ReaderCard();
-		// 处理 USART1 数据（asrpro）
+		// 处理 USART1 数据（asrpro�??
 		if (usart1_data_ready)
 		{
 			usart1_rx_process();  // 处理接收到的数据
-			usart1_data_ready = 0;  // 清除标志位
+			usart1_data_ready = 0;  // 清除标志�??
 		}
 
-		// 处理 USART2 数据（hi3861）
+		// 处理 USART2 数据（hi3861�??
 		if (usart2_data_ready)
 		{
 			usart2_rx_process();  // 处理接收到的数据
-			usart2_data_ready = 0;  // 清除标志位
+			usart2_data_ready = 0;  // 清除标志�??
 		}
+
+    
 //		usart2_func();
 //		printf("other tasks\n");
 		

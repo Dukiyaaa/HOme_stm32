@@ -1,7 +1,7 @@
 #include "dc_motor.h"
 #include "tim.h"
 
-int32_t speed_array[] = {20000,30000,40000}; //速度数组
+int32_t speed_array[] = {20000,25000,30000}; //速度数组
 
 void airConditioner_init(void)
 {
