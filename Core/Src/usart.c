@@ -311,12 +311,15 @@ void send_response(uint8_t response, ParsedData data, UART_HandleTypeDef *huart)
     response_buffer[1] = (response_data >> 16) & 0xFF;
     response_buffer[2] = (response_data >> 8) & 0xFF;
     response_buffer[3] = response_data & 0xFF;
-
-		printf("stm32 sent : %08x\n", *response_buffer);
+	
+	if(data.device_id == 2)
+	{
+		uint8_t angle = (uint8_t)(curtain_get_curangle() / 10);
+		response_buffer[1] |= angle;
+	}
+	printf("stm32 sent : %08x\n", *response_buffer);
     HAL_UART_Transmit(huart, response_buffer, 4, 100);
 }
-
-
 
 void usart1_rx_process(void)
 {

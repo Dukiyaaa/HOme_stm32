@@ -78,14 +78,23 @@ void curtain_open(void)
 uint16_t cur_angle;
 void curtain_open_angle(uint16_t angle)
 {
-  cur_angle = angle;
+	uint16_t tmp = cur_angle;
+    cur_angle += angle;
+	if(cur_angle > 150) cur_angle = 150;
+	angle = cur_angle - tmp;
 	step_motor_run(STEP_MOTOR_BYTE, STEP_MOTOR_DIR_CLOCKWISE, STEP_MOTOR_SPEEP, angle, STEP_MOTOR_START);
 	step_motor_run(STEP_MOTOR_BYTE, STEP_MOTOR_DIR_CLOCKWISE, STEP_MOTOR_SPEEP, angle, STEP_MOTOR_STOP);
 }
 
 void curtain_close_angle(uint16_t angle)
 {
-  cur_angle = angle;
+	uint16_t tmp = cur_angle;
+	if(cur_angle < angle) cur_angle = 0;
+	else
+	{
+		cur_angle -= angle;
+	}
+	angle = tmp - cur_angle;
 	step_motor_run(STEP_MOTOR_BYTE, STEP_MOTOR_DIR_UNCLOCKWISE, STEP_MOTOR_SPEEP, angle, STEP_MOTOR_START);
 	step_motor_run(STEP_MOTOR_BYTE, STEP_MOTOR_DIR_UNCLOCKWISE, STEP_MOTOR_SPEEP, angle, STEP_MOTOR_STOP);
 }
